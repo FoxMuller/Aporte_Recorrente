@@ -170,7 +170,7 @@ def AporteRecorrente_getdata(ticker, startdate, enddate, timeframe):
         df.drop(columns=['Date_New', 'Day', 'Month','Year','Count_Week','WeekDay'], inplace=True)
     return df
 
-def AporteRecorrente (money ,  df, startdate, enddate, rf_cdi 
+def AporteRecorrente (money ,  df, timeframe, startdate, enddate, rf_cdi 
                  , corretagem, issqn, bovespa 
                  , filtro , filtro_periodos , filtro_rsi , filtro_asc, filtro_sinal
                  , pregao
