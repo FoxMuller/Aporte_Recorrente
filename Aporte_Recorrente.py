@@ -5,8 +5,15 @@
 # <h4>Autor: Felipe Muller - cmtemuller@gmail.com</h4>
 # <h4>Versao: 0.81 - 2022-07-22</h4>
 
-# v0.82 - CORRIGIR: O cdi do resto ser tb baseado no rf_cdi
+# v0.85 - CORRIGIR: O cdi do resto ser tb baseado no rf_cdi
 # 
+# v0.84 - Adiconado a função "source" que pode ser yahoo ou csv; "caso" seja csv pega a informação do path
+
+# v0.83 - Adicionado a funçao FII para pegar as informações da Status Invest
+# 
+# v0.82 - 2022-07-29<br>
+# - Para a função excel preciso colocar a variavel ticker
+
 # v0.81 - 2022-07-23<br>
 # - Better use of return_type summary and row
 # - Summary, informações do Filtro utilizado
@@ -49,7 +56,6 @@ import pandas as pd
 import yfinance as yf
 from datetime import datetime, date
 import ta
-
 import sys
 if not sys.warnoptions:
     import warnings
@@ -57,11 +63,11 @@ if not sys.warnoptions:
     
 from get_debit import get_debit
 from real_br_money_mask import real_br_money_mask
-from yf_dividends import yf_dividends
+from yf_dividends import yf_dividends, fii_dividends
 
 # 2. Funções<br>
 
-def AporteRecorrente_getdata(ticker, startdate, enddate, timeframe):
+def AporteRecorrente_getdata(ticker, startdate, enddate, fii, timeframe, source, path):
     
     if (timeframe=="monthly"):
         delta=24
@@ -78,9 +84,25 @@ def AporteRecorrente_getdata(ticker, startdate, enddate, timeframe):
         interval = '1d'
         new_stardate = pd.to_datetime(startdate) - np.timedelta64(delta+1, 'D')
     
-    dados = yf.Ticker(ticker).history(start=new_stardate,end=enddate,interval=interval,auto_adjust = False)
-    dados = yf_dividends(dados, timeframe)
-    
+    if source.lower() == "yahoo":
+        dados = yf.Ticker(ticker).history(start=new_stardate,end=enddate,interval=interval,auto_adjust = False)
+    elif source.lower() == "csv":
+        dados = pd.read_csv(path, delimiter = ";",decimal=",")
+        dados.columns = ["Date","Open", "High", "Low", "Close"]
+        dados["Date"]=pd.to_datetime(dados["Date"], format='%d/%m/%Y')
+        dados.sort_values(by='Date')
+        dados["Volume"]=0
+        dados["Dividends"]=0
+        dados.set_index("Date",drop=True,inplace=True)
+        dados = dados.apply(pd.to_numeric)
+        dados.isna().sum()
+        dados.dropna(axis=0,inplace=True)
+
+    if fii == True:
+        dados = fii_dividends(ticker, dados, timeframe)
+    else:
+        dados = yf_dividends(dados, timeframe)
+        
     ipca=get_debit("ipca")
     cdi=get_debit("cdi")
 
@@ -170,7 +192,8 @@ def AporteRecorrente_getdata(ticker, startdate, enddate, timeframe):
         df.drop(columns=['Date_New', 'Day', 'Month','Year','Count_Week','WeekDay'], inplace=True)
     return df
 
-def AporteRecorrente (money ,  df, timeframe, startdate, enddate, rf_cdi 
+             
+def AporteRecorrente (ticker, money ,  df, timeframe, startdate, enddate, rf_cdi 
                  , corretagem, issqn, bovespa 
                  , filtro , filtro_periodos , filtro_rsi , filtro_asc, filtro_sinal
                  , pregao
@@ -673,3 +696,6 @@ def AporteRecorrente (money ,  df, timeframe, startdate, enddate, rf_cdi
         
     else:
         return df
+   
+
+
