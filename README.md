@@ -1,12 +1,6 @@
 # Aporte_Recorrente
 <hl>
-AporRec = AporteRecorrente_getdata(ticker = ticker
-                              , startdate = startdate
-                              , enddate = enddate
-                              , fii = fii      
-                              , timeframe = timeframe
-                              , source = source
-                              , path = path )
+AporRec = AporteRecorrente_getdata(<i>ticker ("str") , startdate ("datetime"), enddate ("datetime"), fii ("bool"), timeframe ("str"), source ("str"), path("str")</i>)<br>
                               
 ar = AporteRecorrente (ticker = ticker 
                  , money = money
