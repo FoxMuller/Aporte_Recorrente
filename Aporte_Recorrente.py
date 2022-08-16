@@ -5,8 +5,10 @@
 # <h4>Autor: Felipe Muller - cmtemuller@gmail.com</h4>
 # <h4>Versao: 0.81 - 2022-07-22</h4>
 
-# v0.85 - CORRIGIR: O cdi do resto ser tb baseado no rf_cdi
+# v0.86 - CORRIGIR: O cdi do resto ser tb baseado no rf_cdi
 # 
+# v0.85 - Modificado a chamada do get_DividendsSI, adicionado FII True or False
+
 # v0.84 - Adiconado a função "source" que pode ser yahoo ou csv; "caso" seja csv pega a informação do path
 
 # v0.83 - Adicionado a funçao FII para pegar as informações da Status Invest
@@ -99,7 +101,7 @@ def AporteRecorrente_getdata(ticker, startdate, enddate, fii, timeframe, source,
         dados.dropna(axis=0,inplace=True)
 
     if fii == True:
-        dados = fii_dividends(ticker, dados, timeframe)
+        dados = fii_dividends(ticker, dados, timeframe, True)
     else:
         dados = yf_dividends(dados, timeframe)
         
